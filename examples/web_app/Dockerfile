@@ -14,5 +14,3 @@ ADD hello_world.rb /app/
 
 ENV PORT 3000
 ENV RACK_ENV production
-
-CMD ruby /app/hello_world.rb

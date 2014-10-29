@@ -407,10 +407,114 @@ pre .chunk {
 </section>
   </div>
   <div class="slide hidden" id="slide-2">
-    <section class="slide-content"><h1 id="intro">Intro</h1>
+    <section class="slide-content"><h3 id="the-plan">The Plan</h3>
+<ol>
+<li><p>A brief overview of docker.</p>
+</li>
+<li><p>Run a simple web app in docker.</p>
+</li>
+<li><p>Run some scientific software in docker.</p>
+</li>
+</ol>
 </section>
   </div>
   <div class="slide hidden" id="slide-3">
+    <section class="slide-content"><h3 id="mental-model">Mental Model</h3>
+<p>Here&#39;s my (oversimplified) model for using docker.</p>
+<ol>
+<li><p>You build a disk <strong>image</strong>.</p>
+</li>
+<li><p>You create a <strong>container</strong> to run a <strong>command</strong> in the context of the image.</p>
+</li>
+<li><p>When you&#39;re finished, you throw away the container (but you&#39;ll probably reuse the image).</p>
+</li>
+</ol>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-4">
+    <section class="slide-content"><h3 id="use-a-dockerfile-to-build-an-image">Use a <code>Dockerfile</code> to Build an Image</h3>
+<p>Sort of like a playbook (ansible) or recipe (chef).</p>
+<pre><code>FROM ubuntu:14.04                          # base image
+
+MAINTAINER overleaf &lt;team@overleaf.io&gt;     # who are you?
+
+RUN apt-get update &amp;&amp; apt-get -y upgrade   # image setup commands
+RUN apt-get install -y ruby
+RUN gem install sinatra
+RUN mkdir /app
+
+ADD hello_world.rb /app/                   # copy files to image
+
+ENV PORT 8000                              # set environment vars
+ENV RACK_ENV production</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-5">
+    <section class="slide-content"><h3 id="building-an-image">Building an Image</h3>
+<p>To build the example web app:</p>
+<pre><code>$ cd examples/web_app
+$ docker build --tag hello_world .</code></pre>
+<p><code>--tag</code> is how we&#39;ll refer to the image later.</p>
+<p><code>.</code> tells docker that the <code>Dockerfile</code> and <code>ADD</code>ed files are in the current directory.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h3 id="images-are-like-commits">Images are like Commits</h3>
+<p>Each command in the Dockerfile makes a new image.</p>
+<pre>
+Step 0 : FROM ubuntu:14.04
+...
+Status: Downloaded newer image for ubuntu:14.04
+ ---> <b>5506de2b643b</b>
+
+Step 1 : MAINTAINER overleaf <team@overleaf.io>
+...
+ ---> <b>0bf3ae3662b4</b>
+
+Step 2 : RUN apt-get update && apt-get -y upgrade
+...
+ ---> <b>296a361125bd</b>
+</pre>
+
+<p>Each image is identified by a <strong>hash</strong> of its <em>content</em> and its <em>ancestor</em>, like a git commit.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-7">
+    <section class="slide-content"><h3 id="images-form-a-tree">Images form a Tree</h3>
+<p>Only the differences between images are stored.</p>
+<pre>
+$ docker images -ta
+└─511136ea3c5a Virtual Size: 0 B
+  ├─d497ad3926c8 Virtual Size: 192.5 MB
+    ...
+           └─5506de2b643b Virtual Size: <b>199.3 MB</b> Tags: ubuntu:14.04
+              └─0bf3ae3662b4 Virtual Size: <b>199.3 MB</b>     # <i>MAINTAINER ...</i>
+                └─296a361125bd Virtual Size: <b>232.7 MB</b>   # <i>RUN apt-get update ...</i>
+                  └─60d6e9ae2318 Virtual Size: <b>250.4 MB</b> # <i>RUN apt-get install ...</i>
+                    └─a6447b00f7df Virtual Size: <b>267.1 MB</b>
+                      ........
+                              └─203c183acb03 Virtual Size: <b>267.1 MB</b> Tags: hello_world:latest
+</pre>
+
+<p>The tagged image is the result of the build.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-8">
+    <section class="slide-content"><h3 id="run-a-command-in-a-container">Run a Command in a Container</h3>
+<p>Run a command in a container using our image:</p>
+<pre><code>docker run -it --publish 3000:3000 hello_world ruby /app/hello_world.rb
+                                 # ^           ^ command in the container
+                                 # ^ image tag</code></pre>
+<p><code>--publish</code> port 3000 on the host from port 3000 in the container</p>
+<p><code>-it</code> means &quot;interactive tty&quot; (terminal); this just lets us use Ctrl-C to interrupt the server.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-9">
+    <section class="slide-content"><h3 id="-docker-ps-lists-running-containers"><code>docker ps</code> Lists Running Containers</h3>
+<p>TODO</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-10">
     <section class="slide-content"><div class="author">
   <h1 class="name">John Lees-Miller</h1>
     <h3 class="twitter">

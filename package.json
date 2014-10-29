@@ -1,0 +1,12 @@
+{
+  "name": "ds-docker-demo",
+  "description": "Docker demo for Digital Science tech forum",
+  "author": "John Lees-Miller <jdleesmiller@gmail.com>",
+  "dependencies": {
+    "cleaver": "^0.7.2"
+  },
+  "private": true,
+  "scripts": {
+    "cleaver": "cleaver watch slides.md"
+  }
+}

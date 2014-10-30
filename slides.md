@@ -1,16 +1,15 @@
 title: Docker Demo for Digital Science Tech Forum
-author:
-  name: John Lees-Miller
-  twitter: jdleesmiller
-  url: http://jdlm.info
 output: index.html
 controls: true
 progress: true
 
 --
 
-# Docker Demo
-
+# Intro to Docker
+## &hellip; and how we use it at writeLaTeX
+## &nbsp;
+## Dr John Lees-Miller
+## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@writelatex](https://twitter.com/@writelatex)
 ## Digital Science Tech Forum
 ## 30 Oct 2014
 
@@ -18,11 +17,23 @@ progress: true
 
 ### The Plan
 
-1. A brief overview of docker.
+1. Docker by example: run a simple web app in docker.
 
-1. Run a simple web app in docker.
+1. A look at what's happening behind the scenes.
 
-1. Run some scientific software in docker.
+1. How we use docker at writeLaTeX, also by example.
+
+--
+
+### Resources
+
+These slides:
+
+http://jdlm.info/ds-docker-demo
+
+Source code for examples:
+
+https://github.com/jdleesmiller/ds-docker-demo
 
 --
 
@@ -32,13 +43,30 @@ Here's my (oversimplified) model for using docker.
 
 1. You build a disk **image**.
 
-1. You create a **container** to run a **command** in the context of the image.
+1. You create a **container** with a (notional) copy of that image and then run your **command** inside it.
 
-1. When you're finished, you throw away the container (but you'll probably reuse the image).
+1. When the command finishes, you usually throw away the container.
 
 --
 
-### Use a `Dockerfile` to Build an Image
+### Example Web App
+
+Hello World! in Sinatra&hellip;
+
+```
+$ cd examples/web_app
+
+$ cat hello_world.rb
+require 'sinatra'
+
+get '/' do
+  "Hello World!"
+end
+```
+
+--
+
+### Image from `Dockerfile`
 
 Sort of like an ansible playbook or chef recipe.
 
@@ -60,18 +88,51 @@ ENV RACK_ENV production
 
 --
 
-### Building an Image
+### Run `docker build`
 
 To build the example web app:
 
 ```
-$ cd examples/web_app
 $ docker build --tag hello_world .
 ```
 
 `--tag` is how we'll refer to the image later.
 
-`.` tells docker that the `Dockerfile` and `ADD`ed files are in the current directory.
+`.` tells docker that the `Dockerfile` and `ADD`ed files are in the current directory (`examples/web_app`).
+
+--
+
+### Run the Web App in a Container
+
+```
+docker run -it --rm --publish 3000:3000 hello_world ruby /app/hello_world.rb
+                                      # ^           ^ command in the container
+                                      # ^ image tag
+```
+
+'--rm' removes the container once the command has exited
+
+`--publish` forwards port 3000 on the host from port 3000 in the container
+
+`-it` means interactive tty (terminal); this just lets us use Ctrl-C to interrupt the server.
+
+--
+
+### Deploy the Image
+
+You can save it to a tar file:
+```
+docker save hello_world | gzip > hello_world.tar.gz
+```
+and then import it with `docker import`.
+
+Or you can run a [private registry](https://github.com/docker/docker-registry) and push the image there.
+
+--
+
+### Behind the Scenes&hellip;
+
+Let's start with the [build output](output/web_app/build.txt).
 
 --
 
@@ -122,41 +183,6 @@ d497ad3926c8        8 days ago          ... #(nop) ADD file:3996...  192.5 MB
 ```
 
 The `hello_world` tag points to image `203c183acb03`.
-
---
-
-### Run a Command in a Container
-
-```
-docker run -it --rm --publish 3000:3000 hello_world ruby /app/hello_world.rb
-                                      # ^           ^ command in the container
-                                      # ^ image tag
-```
-
-'--rm' removes the container once the command has exited
-
-`--publish` forwards port 3000 on the host from port 3000 in the container
-
-`-it` means interactive tty (terminal); this just lets us use Ctrl-C to interrupt the server.
-
---
-
-### `docker ps` Lists Running Containers
-
-<pre>
-$ docker ps
-CONTAINER ID        IMAGE                COMMAND                CREATED       \
-fa23530d3502        hello_world:latest   "ruby /app/hello_wor   4 seconds ago \
-
-STATUS              PORTS                    NAMES
-Up 3 seconds        0.0.0.0:3000->3000/tcp   backstabbing_shockley
-</pre>
-
-The name is randomly generated for easy reference, e.g. to stop the container:
-
-```
-docker kill backstabbing_shockley
-```
 
 --
 
@@ -271,4 +297,13 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main
 
 * Each compile job gets its own short-lived container.
 
-* This adds another layer to our security system.
+* It adds another layer of security.
+
+--
+
+# fin
+## &nbsp;
+## Dr John Lees-Miller
+## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@writelatex](https://twitter.com/@writelatex)
+## Digital Science Tech Forum
+## 30 Oct 2014

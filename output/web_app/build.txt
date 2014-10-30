@@ -1,0 +1,194 @@
+$ docker build --tag "hello_world" .
+Sending build context to Docker daemon 3.584 kB
+Sending build context to Docker daemon
+Step 0 : FROM ubuntu:14.04
+ubuntu:14.04: The image you are pulling has been verified
+d497ad3926c8: Pull complete
+ccb62158e970: Pull complete
+e791be0477f2: Pull complete
+3680052c0f5c: Pull complete
+22093c35d77b: Pull complete
+5506de2b643b: Pull complete
+511136ea3c5a: Already exists
+Status: Downloaded newer image for ubuntu:14.04
+ ---> 5506de2b643b
+Step 1 : MAINTAINER overleaf <team@overleaf.io>
+ ---> Running in ac573b2f165e
+ ---> 8f9647cfbf6f
+Removing intermediate container ac573b2f165e
+Step 2 : RUN apt-get update && apt-get -y upgrade
+ ---> Running in c16d6abb1139
+Ign http://archive.ubuntu.com trusty InRelease
+Ign http://archive.ubuntu.com trusty-updates InRelease
+Ign http://archive.ubuntu.com trusty-security InRelease
+Ign http://archive.ubuntu.com trusty-proposed InRelease
+Get:1 http://archive.ubuntu.com trusty Release.gpg [933 B]
+Get:2 http://archive.ubuntu.com trusty-updates Release.gpg [933 B]
+Get:3 http://archive.ubuntu.com trusty-security Release.gpg [933 B]
+Get:4 http://archive.ubuntu.com trusty-proposed Release.gpg [933 B]
+Get:5 http://archive.ubuntu.com trusty Release [58.5 kB]
+Get:6 http://archive.ubuntu.com trusty-updates Release [59.7 kB]
+Get:7 http://archive.ubuntu.com trusty-security Release [59.7 kB]
+Get:8 http://archive.ubuntu.com trusty-proposed Release [110 kB]
+Get:9 http://archive.ubuntu.com trusty/main Sources [1335 kB]
+Get:10 http://archive.ubuntu.com trusty/restricted Sources [5335 B]
+Get:11 http://archive.ubuntu.com trusty/universe Sources [7926 kB]
+Get:12 http://archive.ubuntu.com trusty/main amd64 Packages [1743 kB]
+Get:13 http://archive.ubuntu.com trusty/restricted amd64 Packages [16.0 kB]
+Get:14 http://archive.ubuntu.com trusty/universe amd64 Packages [7589 kB]
+Get:15 http://archive.ubuntu.com trusty-updates/main Sources [172 kB]
+Get:16 http://archive.ubuntu.com trusty-updates/restricted Sources [1250 B]
+Get:17 http://archive.ubuntu.com trusty-updates/universe Sources [110 kB]
+Get:18 http://archive.ubuntu.com trusty-updates/main amd64 Packages [447 kB]
+Get:19 http://archive.ubuntu.com trusty-updates/restricted amd64 Packages [6341 B]
+Get:20 http://archive.ubuntu.com trusty-updates/universe amd64 Packages [281 kB]
+Get:21 http://archive.ubuntu.com trusty-security/main Sources [58.4 kB]
+Get:22 http://archive.ubuntu.com trusty-security/restricted Sources [40 B]
+Get:23 http://archive.ubuntu.com trusty-security/universe Sources [11.8 kB]
+Get:24 http://archive.ubuntu.com trusty-security/main amd64 Packages [192 kB]
+Get:25 http://archive.ubuntu.com trusty-security/restricted amd64 Packages [40 B]
+Get:26 http://archive.ubuntu.com trusty-security/universe amd64 Packages [62.4 kB]
+Get:27 http://archive.ubuntu.com trusty-proposed/main amd64 Packages [160 kB]
+Get:28 http://archive.ubuntu.com trusty-proposed/restricted amd64 Packages [40 B]
+Fetched 20.4 MB in 34s (590 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be upgraded:
+  apt apt-utils libapt-inst1.5 libapt-pkg4.12
+4 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1823 kB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu/ trusty-proposed/main libapt-pkg4.12 amd64 1.0.1ubuntu2.6 [638 kB]
+Get:2 http://archive.ubuntu.com/ubuntu/ trusty-proposed/main apt amd64 1.0.1ubuntu2.6 [954 kB]
+Get:3 http://archive.ubuntu.com/ubuntu/ trusty-proposed/main libapt-inst1.5 amd64 1.0.1ubuntu2.6 [58.6 kB]
+Get:4 http://archive.ubuntu.com/ubuntu/ trusty-proposed/main apt-utils amd64 1.0.1ubuntu2.6 [172 kB]
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+dpkg-preconfigure: unable to re-open stdin:
+Fetched 1823 kB in 6s (295 kB/s)
+(Reading database ... 11527 files and directories currently installed.)
+Preparing to unpack .../libapt-pkg4.12_1.0.1ubuntu2.6_amd64.deb ...
+Unpacking libapt-pkg4.12:amd64 (1.0.1ubuntu2.6) over (1.0.1ubuntu2.5) ...
+Setting up libapt-pkg4.12:amd64 (1.0.1ubuntu2.6) ...
+Processing triggers for libc-bin (2.19-0ubuntu6.3) ...
+(Reading database ... 11527 files and directories currently installed.)
+Preparing to unpack .../apt_1.0.1ubuntu2.6_amd64.deb ...
+Unpacking apt (1.0.1ubuntu2.6) over (1.0.1ubuntu2.5) ...
+Setting up apt (1.0.1ubuntu2.6) ...
+Processing triggers for libc-bin (2.19-0ubuntu6.3) ...
+(Reading database ... 11527 files and directories currently installed.)
+Preparing to unpack .../libapt-inst1.5_1.0.1ubuntu2.6_amd64.deb ...
+Unpacking libapt-inst1.5:amd64 (1.0.1ubuntu2.6) over (1.0.1ubuntu2.5) ...
+Preparing to unpack .../apt-utils_1.0.1ubuntu2.6_amd64.deb ...
+Unpacking apt-utils (1.0.1ubuntu2.6) over (1.0.1ubuntu2.5) ...
+Setting up libapt-inst1.5:amd64 (1.0.1ubuntu2.6) ...
+Setting up apt-utils (1.0.1ubuntu2.6) ...
+Processing triggers for libc-bin (2.19-0ubuntu6.3) ...
+ ---> cc28edeb5642
+Removing intermediate container c16d6abb1139
+Step 3 : RUN apt-get install -y ruby
+ ---> Running in 93ba1aeedcea
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following extra packages will be installed:
+  ca-certificates libruby1.9.1 libyaml-0-2 openssl ruby1.9.1
+Suggested packages:
+  ri ruby-dev ruby1.9.1-examples ri1.9.1 graphviz ruby1.9.1-dev ruby-switch
+The following NEW packages will be installed:
+  ca-certificates libruby1.9.1 libyaml-0-2 openssl ruby ruby1.9.1
+0 upgraded, 6 newly installed, 0 to remove and 0 not upgraded.
+Need to get 3420 kB of archives.
+After this operation, 14.2 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu/ trusty/main libyaml-0-2 amd64 0.1.4-3ubuntu3 [48.2 kB]
+Get:2 http://archive.ubuntu.com/ubuntu/ trusty-updates/main openssl amd64 1.0.1f-1ubuntu2.7 [489 kB]
+Get:3 http://archive.ubuntu.com/ubuntu/ trusty/main ca-certificates all 20130906ubuntu2 [175 kB]
+Get:4 http://archive.ubuntu.com/ubuntu/ trusty/main ruby all 1:1.9.3.4 [5334 B]
+Get:5 http://archive.ubuntu.com/ubuntu/ trusty/main ruby1.9.1 amd64 1.9.3.484-2ubuntu1 [35.6 kB]
+Get:6 http://archive.ubuntu.com/ubuntu/ trusty/main libruby1.9.1 amd64 1.9.3.484-2ubuntu1 [2667 kB]
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+dpkg-preconfigure: unable to re-open stdin:
+Fetched 3420 kB in 7s (429 kB/s)
+Selecting previously unselected package libyaml-0-2:amd64.
+(Reading database ... 11527 files and directories currently installed.)
+Preparing to unpack .../libyaml-0-2_0.1.4-3ubuntu3_amd64.deb ...
+Unpacking libyaml-0-2:amd64 (0.1.4-3ubuntu3) ...
+Selecting previously unselected package openssl.
+Preparing to unpack .../openssl_1.0.1f-1ubuntu2.7_amd64.deb ...
+Unpacking openssl (1.0.1f-1ubuntu2.7) ...
+Selecting previously unselected package ca-certificates.
+Preparing to unpack .../ca-certificates_20130906ubuntu2_all.deb ...
+Unpacking ca-certificates (20130906ubuntu2) ...
+Selecting previously unselected package ruby.
+Preparing to unpack .../ruby_1%3a1.9.3.4_all.deb ...
+Unpacking ruby (1:1.9.3.4) ...
+Selecting previously unselected package ruby1.9.1.
+Preparing to unpack .../ruby1.9.1_1.9.3.484-2ubuntu1_amd64.deb ...
+Unpacking ruby1.9.1 (1.9.3.484-2ubuntu1) ...
+Selecting previously unselected package libruby1.9.1.
+Preparing to unpack .../libruby1.9.1_1.9.3.484-2ubuntu1_amd64.deb ...
+Unpacking libruby1.9.1 (1.9.3.484-2ubuntu1) ...
+Setting up libyaml-0-2:amd64 (0.1.4-3ubuntu3) ...
+Setting up openssl (1.0.1f-1ubuntu2.7) ...
+Setting up ca-certificates (20130906ubuntu2) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+Setting up ruby (1:1.9.3.4) ...
+Setting up ruby1.9.1 (1.9.3.484-2ubuntu1) ...
+Setting up libruby1.9.1 (1.9.3.484-2ubuntu1) ...
+Processing triggers for libc-bin (2.19-0ubuntu6.3) ...
+Processing triggers for ca-certificates (20130906ubuntu2) ...
+Updating certificates in /etc/ssl/certs... 164 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d....done.
+ ---> a678feea5a7e
+Removing intermediate container 93ba1aeedcea
+Step 4 : RUN gem install sinatra
+ ---> Running in 93f5d18ea433
+unable to convert "\xC3" to UTF-8 in conversion from ASCII-8BIT to UTF-8 to US-ASCII for README.rdoc, skipping
+unable to convert "\xC3" to UTF-8 in conversion from ASCII-8BIT to UTF-8 to US-ASCII for README.rdoc, skipping
+Successfully installed rack-1.5.2
+Successfully installed tilt-1.4.1
+Successfully installed rack-protection-1.5.3
+Successfully installed sinatra-1.4.5
+4 gems installed
+Installing ri documentation for rack-1.5.2...
+Installing ri documentation for tilt-1.4.1...
+Installing ri documentation for rack-protection-1.5.3...
+Installing ri documentation for sinatra-1.4.5...
+Installing RDoc documentation for rack-1.5.2...
+Installing RDoc documentation for tilt-1.4.1...
+Installing RDoc documentation for rack-protection-1.5.3...
+Installing RDoc documentation for sinatra-1.4.5...
+ ---> 1aa7ce47f8fb
+Removing intermediate container 93f5d18ea433
+Step 5 : RUN mkdir /app
+ ---> Running in acfece64d8e2
+ ---> b87305a06952
+Removing intermediate container acfece64d8e2
+Step 6 : ADD hello_world.rb /app/
+ ---> 16c7c4956eea
+Removing intermediate container f0abd356d230
+Step 7 : ENV PORT 3000
+ ---> Running in cbe66a7d966a
+ ---> 08ce6a499e99
+Removing intermediate container cbe66a7d966a
+Step 8 : ENV RACK_ENV production
+ ---> Running in ec1b9b39ffe8
+ ---> c99441b72ec0
+Removing intermediate container ec1b9b39ffe8
+Successfully built c99441b72ec0

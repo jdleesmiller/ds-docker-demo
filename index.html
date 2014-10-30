@@ -401,7 +401,11 @@ pre .chunk {
   </div>
 
   <div class="slide" id="slide-1">
-    <section class="slide-content"><h1 id="docker-demo">Docker Demo</h1>
+    <section class="slide-content"><h1 id="intro-to-docker">Intro to Docker</h1>
+<h2 id="-hellip-and-how-we-use-it-at-writelatex">&hellip; and how we use it at writeLaTeX</h2>
+<h2 id="-nbsp-">&nbsp;</h2>
+<h2 id="dr-john-lees-miller">Dr John Lees-Miller</h2>
+<h2 id="-jdleesmiller-https-twitter-com-jdleesmiller-writelatex-https-twitter-com-writelatex-"><a href="https://twitter.com/@jdleesmiller">@jdleesmiller</a> <a href="https://twitter.com/@writelatex">@writelatex</a></h2>
 <h2 id="digital-science-tech-forum">Digital Science Tech Forum</h2>
 <h2 id="30-oct-2014">30 Oct 2014</h2>
 </section>
@@ -409,30 +413,51 @@ pre .chunk {
   <div class="slide hidden" id="slide-2">
     <section class="slide-content"><h3 id="the-plan">The Plan</h3>
 <ol>
-<li><p>A brief overview of docker.</p>
+<li><p>Docker by example: run a simple web app in docker.</p>
 </li>
-<li><p>Run a simple web app in docker.</p>
+<li><p>A look at what&#39;s happening behind the scenes.</p>
 </li>
-<li><p>Run some scientific software in docker.</p>
+<li><p>How we use docker at writeLaTeX, also by example.</p>
 </li>
 </ol>
 </section>
   </div>
   <div class="slide hidden" id="slide-3">
+    <section class="slide-content"><h3 id="resources">Resources</h3>
+<p>These slides:</p>
+<p><a href="http://jdlm.info/ds-docker-demo">http://jdlm.info/ds-docker-demo</a></p>
+<p>Source code for examples:</p>
+<p><a href="https://github.com/jdleesmiller/ds-docker-demo">https://github.com/jdleesmiller/ds-docker-demo</a></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-4">
     <section class="slide-content"><h3 id="mental-model">Mental Model</h3>
 <p>Here&#39;s my (oversimplified) model for using docker.</p>
 <ol>
 <li><p>You build a disk <strong>image</strong>.</p>
 </li>
-<li><p>You create a <strong>container</strong> to run a <strong>command</strong> in the context of the image.</p>
+<li><p>You create a <strong>container</strong> with a (notional) copy of that image and then run your <strong>command</strong> inside it.</p>
 </li>
-<li><p>When you&#39;re finished, you throw away the container (but you&#39;ll probably reuse the image).</p>
+<li><p>When the command finishes, you usually throw away the container.</p>
 </li>
 </ol>
 </section>
   </div>
-  <div class="slide hidden" id="slide-4">
-    <section class="slide-content"><h3 id="use-a-dockerfile-to-build-an-image">Use a <code>Dockerfile</code> to Build an Image</h3>
+  <div class="slide hidden" id="slide-5">
+    <section class="slide-content"><h3 id="example-web-app">Example Web App</h3>
+<p>Hello World! in Sinatra&hellip;</p>
+<pre><code>$ cd examples/web_app
+
+$ cat hello_world.rb
+require &#39;sinatra&#39;
+
+get &#39;/&#39; do
+  &quot;Hello World!&quot;
+end</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h3 id="image-from-dockerfile-">Image from <code>Dockerfile</code></h3>
 <p>Sort of like an ansible playbook or chef recipe.</p>
 <pre><code>FROM ubuntu:14.04                          # base image
 
@@ -449,16 +474,38 @@ ENV PORT 8000                              # set environment vars
 ENV RACK_ENV production</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-5">
-    <section class="slide-content"><h3 id="building-an-image">Building an Image</h3>
+  <div class="slide hidden" id="slide-7">
+    <section class="slide-content"><h3 id="run-docker-build-">Run <code>docker build</code></h3>
 <p>To build the example web app:</p>
-<pre><code>$ cd examples/web_app
-$ docker build --tag hello_world .</code></pre>
+<pre><code>$ docker build --tag hello_world .</code></pre>
 <p><code>--tag</code> is how we&#39;ll refer to the image later.</p>
-<p><code>.</code> tells docker that the <code>Dockerfile</code> and <code>ADD</code>ed files are in the current directory.</p>
+<p><code>.</code> tells docker that the <code>Dockerfile</code> and <code>ADD</code>ed files are in the current directory (<code>examples/web_app</code>).</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-6">
+  <div class="slide hidden" id="slide-8">
+    <section class="slide-content"><h3 id="run-the-web-app-in-a-container">Run the Web App in a Container</h3>
+<pre><code>docker run -it --rm --publish 3000:3000 hello_world ruby /app/hello_world.rb
+                                      # ^           ^ command in the container
+                                      # ^ image tag</code></pre>
+<p>&#39;--rm&#39; removes the container once the command has exited</p>
+<p><code>--publish</code> forwards port 3000 on the host from port 3000 in the container</p>
+<p><code>-it</code> means interactive tty (terminal); this just lets us use Ctrl-C to interrupt the server.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-9">
+    <section class="slide-content"><h3 id="deploy-the-image">Deploy the Image</h3>
+<p>You can save it to a tar file:</p>
+<pre><code>docker save hello_world | gzip &gt; hello_world.tar.gz</code></pre>
+<p>and then import it with <code>docker import</code>.</p>
+<p>Or you can run a <a href="https://github.com/docker/docker-registry">private registry</a> and push the image there.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-10">
+    <section class="slide-content"><h3 id="behind-the-scenes-hellip-">Behind the Scenes&hellip;</h3>
+<p>Let&#39;s start with the <a href="output/web_app/build.txt">build output</a>.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-11">
     <section class="slide-content"><h3 id="images-are-like-git-commits">Images are like git Commits</h3>
 <p>Each command in the Dockerfile makes a new image.</p>
 <pre>
@@ -479,7 +526,7 @@ Step 2 : RUN apt-get update && apt-get -y upgrade
 <p>Each image is identified by a <strong>hash</strong> of its <em>content</em> and its <em>ancestor</em>, like a git commit.</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-7">
+  <div class="slide hidden" id="slide-12">
     <section class="slide-content"><h3 id="only-diffs-of-images-are-stored">Only &quot;Diffs&quot; of Images are Stored</h3>
 <pre><code>$ docker history hello_world
 IMAGE               CREATED             CREATED BY                      SIZE
@@ -502,32 +549,7 @@ d497ad3926c8        8 days ago          ... #(nop) ADD file:3996...  192.5 MB
 <p>The <code>hello_world</code> tag points to image <code>203c183acb03</code>.</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-8">
-    <section class="slide-content"><h3 id="run-a-command-in-a-container">Run a Command in a Container</h3>
-<pre><code>docker run -it --rm --publish 3000:3000 hello_world ruby /app/hello_world.rb
-                                      # ^           ^ command in the container
-                                      # ^ image tag</code></pre>
-<p>&#39;--rm&#39; removes the container once the command has exited</p>
-<p><code>--publish</code> forwards port 3000 on the host from port 3000 in the container</p>
-<p><code>-it</code> means interactive tty (terminal); this just lets us use Ctrl-C to interrupt the server.</p>
-</section>
-  </div>
-  <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h3 id="-docker-ps-lists-running-containers"><code>docker ps</code> Lists Running Containers</h3>
-<pre>
-$ docker ps
-CONTAINER ID        IMAGE                COMMAND                CREATED       \
-fa23530d3502        hello_world:latest   "ruby /app/hello_wor   4 seconds ago \
-
-STATUS              PORTS                    NAMES
-Up 3 seconds        0.0.0.0:3000->3000/tcp   backstabbing_shockley
-</pre>
-
-<p>The name is randomly generated for easy reference, e.g. to stop the container:</p>
-<pre><code>docker kill backstabbing_shockley</code></pre>
-</section>
-  </div>
-  <div class="slide hidden" id="slide-10">
+  <div class="slide hidden" id="slide-13">
     <section class="slide-content"><h3 id="incremental-rebuilds-are-cheap">Incremental Rebuilds are Cheap</h3>
 <p>If we change <code>examples/web_app/hello_world.rb</code> to output a different message and rebuild the container, docker reuses cached images for the preceeding steps.</p>
 <pre>
@@ -545,7 +567,7 @@ Step 6 : ADD hello_world.rb /app/
 ...
 </pre></section>
   </div>
-  <div class="slide hidden" id="slide-11">
+  <div class="slide hidden" id="slide-14">
     <section class="slide-content"><h3 id="images-form-a-tree">Images form a Tree</h3>
 <pre>
 $ docker images -ta
@@ -564,7 +586,7 @@ $ docker images -ta
                   └─203c183acb03 Virtual Size: 267.1 MB <em># <-- the old hello_world</em>
 </pre></section>
   </div>
-  <div class="slide hidden" id="slide-12">
+  <div class="slide hidden" id="slide-15">
     <section class="slide-content"><h3 id="more-about-containers">More About Containers</h3>
 <p>You can run a shell in a container to explore or use an image interactively:</p>
 <pre><code>docker run -it hello_world /bin/bash</code></pre>
@@ -572,7 +594,7 @@ $ docker images -ta
 This can be useful in development, but docker has other solutions for data persistence that are better in production; see <a href="https://docs.docker.com/userguide/dockervolumes/">data volumes</a>.</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-13">
+  <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h3 id="web-app-example-improvements">Web App Example Improvements</h3>
 <ul>
 <li><p>The process runs as root inside our container, which is bad. Docker can run the process as an <a href="http://docs.docker.com/reference/run/#user">unprivileged user</a> instead (exercise).</p>
@@ -582,7 +604,7 @@ This can be useful in development, but docker has other solutions for data persi
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="latex-in-a-container">LaTeX in a Container</h3>
 <p>Because creating and destroying containers is very fast, we can use them for short-lived processes, too.</p>
 <p>Example (<code>examples/latex/Dockerfile</code>):</p>
@@ -597,7 +619,7 @@ RUN apt-get install -y texlive-latex-base
 WORKDIR /tmp # by default, start commands in the container in /tmp</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="latex-in-a-container">LaTeX in a Container</h3>
 <p>To build and run:</p>
 <pre><code>cd examples/latex
@@ -607,7 +629,7 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main</code></pre>
 <p><code>pdflatex main</code> is the command that runs inside the container, to compile a file called <code>main.tex</code>.</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h3 id="latex-example-improvements">LaTeX Example Improvements</h3>
 <ul>
 <li><p>Again, we shouldn&#39;t be running the compile as root in the container, but that requires getting the permissions on the host to match up with those in the container.</p>
@@ -617,28 +639,25 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main</code></pre>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><h3 id="docker-at-writelatex">Docker at writeLaTeX</h3>
 <ul>
 <li><p>We maintain a Dockerfile that builds an image with latex and lots of related tools.</p>
 </li>
 <li><p>Each compile job gets its own short-lived container.</p>
 </li>
-<li><p>This adds another layer to our security system.</p>
+<li><p>It adds another layer of security.</p>
 </li>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
-    <section class="slide-content"><div class="author">
-  <h1 class="name">John Lees-Miller</h1>
-    <h3 class="twitter">
-      <a href="http://twitter.com/@jdleesmiller">@jdleesmiller</a>
-    </h3>
-    <h3 class="url">
-      <a href="http://jdlm.info">http://jdlm.info</a>
-    </h3>
-</div>
+  <div class="slide hidden" id="slide-21">
+    <section class="slide-content"><h1 id="fin">fin</h1>
+<h2 id="-nbsp-">&nbsp;</h2>
+<h2 id="dr-john-lees-miller">Dr John Lees-Miller</h2>
+<h2 id="-jdleesmiller-https-twitter-com-jdleesmiller-writelatex-https-twitter-com-writelatex-"><a href="https://twitter.com/@jdleesmiller">@jdleesmiller</a> <a href="https://twitter.com/@writelatex">@writelatex</a></h2>
+<h2 id="digital-science-tech-forum">Digital Science Tech Forum</h2>
+<h2 id="30-oct-2014">30 Oct 2014</h2>
 </section>
   </div>
 

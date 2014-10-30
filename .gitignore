@@ -1,4 +1,4 @@
 node_modules
 .nfs*
-
+._*
 *.swp

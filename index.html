@@ -433,7 +433,7 @@ pre .chunk {
   </div>
   <div class="slide hidden" id="slide-4">
     <section class="slide-content"><h3 id="use-a-dockerfile-to-build-an-image">Use a <code>Dockerfile</code> to Build an Image</h3>
-<p>Sort of like a playbook (ansible) or recipe (chef).</p>
+<p>Sort of like an ansible playbook or chef recipe.</p>
 <pre><code>FROM ubuntu:14.04                          # base image
 
 MAINTAINER overleaf &lt;team@overleaf.io&gt;     # who are you?
@@ -459,7 +459,7 @@ $ docker build --tag hello_world .</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-6">
-    <section class="slide-content"><h3 id="images-are-like-commits">Images are like Commits</h3>
+    <section class="slide-content"><h3 id="images-are-like-git-commits">Images are like git Commits</h3>
 <p>Each command in the Dockerfile makes a new image.</p>
 <pre>
 Step 0 : FROM ubuntu:14.04
@@ -480,41 +480,156 @@ Step 2 : RUN apt-get update && apt-get -y upgrade
 </section>
   </div>
   <div class="slide hidden" id="slide-7">
+    <section class="slide-content"><h3 id="only-diffs-of-images-are-stored">Only &quot;Diffs&quot; of Images are Stored</h3>
+<pre><code>$ docker history hello_world
+IMAGE               CREATED             CREATED BY                      SIZE
+203c183acb03        2 minutes ago       ... #(nop) CMD [/bin/sh ...      0 B
+d1df6bf66499        2 minutes ago       ... #(nop) ENV RACK_ENV=...      0 B
+24a3db493063        2 minutes ago       ... #(nop) ENV PORT=3000...      0 B
+e567e577d823        2 minutes ago       ... #(nop) ADD file:4164...     52 B
+5695586ee7a3        2 minutes ago       ... mkdir /app          ...      0 B
+a6447b00f7df        2 minutes ago       ... gem install sinatra ...   16.7 MB
+60d6e9ae2318        3 minutes ago       ... apt-get install -y r...  17.67 MB
+296a361125bd        4 minutes ago       ... apt-get update &amp;&amp; ap...  33.49 MB
+0bf3ae3662b4        5 minutes ago       ... #(nop) MAINTAINER ov...      0 B
+5506de2b643b        5 days ago          ... #(nop) CMD [/bin/bas...      0 B
+22093c35d77b        5 days ago          ... apt-get update &amp;&amp; ap...  6.558 MB
+3680052c0f5c        5 days ago          ... sed -i &#39;s/^#\s*\(deb...  1.895 kB
+e791be0477f2        5 days ago          ... rm -rf /var/lib/apt/...      0 B
+ccb62158e970        5 days ago          ... echo &#39;#!/bin/sh&#39; &gt; /...  194.8 kB
+d497ad3926c8        8 days ago          ... #(nop) ADD file:3996...  192.5 MB
+511136ea3c5a        16 months ago                                        0 B</code></pre>
+<p>The <code>hello_world</code> tag points to image <code>203c183acb03</code>.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-8">
+    <section class="slide-content"><h3 id="run-a-command-in-a-container">Run a Command in a Container</h3>
+<pre><code>docker run -it --rm --publish 3000:3000 hello_world ruby /app/hello_world.rb
+                                      # ^           ^ command in the container
+                                      # ^ image tag</code></pre>
+<p>&#39;--rm&#39; removes the container once the command has exited</p>
+<p><code>--publish</code> forwards port 3000 on the host from port 3000 in the container</p>
+<p><code>-it</code> means interactive tty (terminal); this just lets us use Ctrl-C to interrupt the server.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-9">
+    <section class="slide-content"><h3 id="-docker-ps-lists-running-containers"><code>docker ps</code> Lists Running Containers</h3>
+<pre>
+$ docker ps
+CONTAINER ID        IMAGE                COMMAND                CREATED       \
+fa23530d3502        hello_world:latest   "ruby /app/hello_wor   4 seconds ago \
+
+STATUS              PORTS                    NAMES
+Up 3 seconds        0.0.0.0:3000->3000/tcp   backstabbing_shockley
+</pre>
+
+<p>The name is randomly generated for easy reference, e.g. to stop the container:</p>
+<pre><code>docker kill backstabbing_shockley</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-10">
+    <section class="slide-content"><h3 id="incremental-rebuilds-are-cheap">Incremental Rebuilds are Cheap</h3>
+<p>If we change <code>examples/web_app/hello_world.rb</code> to output a different message and rebuild the container, docker reuses cached images for the preceeding steps.</p>
+<pre>
+$ sed -i 's/World/Docker/' hello_world.rb
+$ docker images -ta
+...
+Step 4 : RUN gem install sinatra
+ ---> <b>Using cache</b>
+ ---> a6447b00f7df
+Step 5 : RUN mkdir /app
+ ---> <b>Using cache</b>
+ ---> 5695586ee7a3
+Step 6 : ADD hello_world.rb /app/
+ ---> 4c535a0a4a01 <em># now things have changed</em>
+...
+</pre></section>
+  </div>
+  <div class="slide hidden" id="slide-11">
     <section class="slide-content"><h3 id="images-form-a-tree">Images form a Tree</h3>
-<p>Only the differences between images are stored.</p>
 <pre>
 $ docker images -ta
 └─511136ea3c5a Virtual Size: 0 B
   ├─d497ad3926c8 Virtual Size: 192.5 MB
     ...
-           └─5506de2b643b Virtual Size: <b>199.3 MB</b> Tags: ubuntu:14.04
-              └─0bf3ae3662b4 Virtual Size: <b>199.3 MB</b>     # <i>MAINTAINER ...</i>
-                └─296a361125bd Virtual Size: <b>232.7 MB</b>   # <i>RUN apt-get update ...</i>
-                  └─60d6e9ae2318 Virtual Size: <b>250.4 MB</b> # <i>RUN apt-get install ...</i>
-                    └─a6447b00f7df Virtual Size: <b>267.1 MB</b>
-                      ........
-                              └─203c183acb03 Virtual Size: <b>267.1 MB</b> Tags: hello_world:latest
-</pre>
+      └─5506de2b643b Virtual Size: 199.3 MB Tags: ubuntu:14.04
+        ...
+          └─5695586ee7a3 Virtual Size: 267.1 MB         <em># RUN mkdir /app</em>
+            ├─4c535a0a4a01 Virtual Size: 267.1 MB       <em># ADD hello_world...</em>
+            │ └─e7352ee9bedd Virtual Size: 267.1 MB
+            │   └─fb17a307e866 Virtual Size: 267.1 MB Tags: hello_world:latest
+            └─e567e577d823 Virtual Size: 267.1 MB       <em># ADD hello_world...</em>
+              └─24a3db493063 Virtual Size: 267.1 MB
+                └─d1df6bf66499 Virtual Size: 267.1 MB
+                  └─203c183acb03 Virtual Size: 267.1 MB <em># <-- the old hello_world</em>
+</pre></section>
+  </div>
+  <div class="slide hidden" id="slide-12">
+    <section class="slide-content"><h3 id="more-about-containers">More About Containers</h3>
+<p>You can run a shell in a container to explore or use an image interactively:</p>
+<pre><code>docker run -it hello_world /bin/bash</code></pre>
+<p>If you make changes in the container and kill it (but don&#39;t remove it), you can restart it later, and your changes will persist.
+This can be useful in development, but docker has other solutions for data persistence that are better in production; see <a href="https://docs.docker.com/userguide/dockervolumes/">data volumes</a>.</p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h3 id="web-app-example-improvements">Web App Example Improvements</h3>
+<ul>
+<li><p>The process runs as root inside our container, which is bad. Docker can run the process as an <a href="http://docs.docker.com/reference/run/#user">unprivileged user</a> instead (exercise).</p>
+</li>
+<li><p>We&#39;re using system ruby on Debian, which is far out of date. It&#39;s usually better to install with <a href="http://rvm.io/">RVM</a> (exercise) or <a href="https://registry.hub.docker.com/">find a docker image in the registry</a> with ruby installed.</p>
+</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
+    <section class="slide-content"><h3 id="latex-in-a-container">LaTeX in a Container</h3>
+<p>Because creating and destroying containers is very fast, we can use them for short-lived processes, too.</p>
+<p>Example (<code>examples/latex/Dockerfile</code>):</p>
+<pre><code>FROM ubuntu:14.04
 
-<p>The tagged image is the result of the build.</p>
+MAINTAINER overleaf &lt;team@overleaf.io&gt;
+
+RUN apt-get update &amp;&amp; apt-get -y upgrade
+
+RUN apt-get install -y texlive-latex-base
+
+WORKDIR /tmp # by default, start commands in the container in /tmp</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-8">
-    <section class="slide-content"><h3 id="run-a-command-in-a-container">Run a Command in a Container</h3>
-<p>Run a command in a container using our image:</p>
-<pre><code>docker run -it --publish 3000:3000 hello_world ruby /app/hello_world.rb
-                                 # ^           ^ command in the container
-                                 # ^ image tag</code></pre>
-<p><code>--publish</code> port 3000 on the host from port 3000 in the container</p>
-<p><code>-it</code> means &quot;interactive tty&quot; (terminal); this just lets us use Ctrl-C to interrupt the server.</p>
+  <div class="slide hidden" id="slide-15">
+    <section class="slide-content"><h3 id="latex-in-a-container">LaTeX in a Container</h3>
+<p>To build and run:</p>
+<pre><code>cd examples/latex
+docker build --tag texlive .
+docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main</code></pre>
+<p><code>--volume</code> mounts the current working directory on the host as <code>/tmp</code> inside the container.</p>
+<p><code>pdflatex main</code> is the command that runs inside the container, to compile a file called <code>main.tex</code>.</p>
 </section>
   </div>
-  <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h3 id="-docker-ps-lists-running-containers"><code>docker ps</code> Lists Running Containers</h3>
-<p>TODO</p>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h3 id="latex-example-improvements">LaTeX Example Improvements</h3>
+<ul>
+<li><p>Again, we shouldn&#39;t be running the compile as root in the container, but that requires getting the permissions on the host to match up with those in the container.</p>
+</li>
+<li><p>We could install a lot more software. A full install of TeX Live is over 4GB, and there are many related packages.</p>
+</li>
+</ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-10">
+  <div class="slide hidden" id="slide-17">
+    <section class="slide-content"><h3 id="docker-at-writelatex">Docker at writeLaTeX</h3>
+<ul>
+<li><p>We maintain a Dockerfile that builds an image with latex and lots of related tools.</p>
+</li>
+<li><p>Each compile job gets its own short-lived container.</p>
+</li>
+<li><p>This adds another layer to our security system.</p>
+</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><div class="author">
   <h1 class="name">John Lees-Miller</h1>
     <h3 class="twitter">

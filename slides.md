@@ -299,6 +299,8 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main
 
 * It adds another layer of security.
 
+* No real stability problems since ~0.9.
+
 --
 
 # fin

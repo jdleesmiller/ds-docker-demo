@@ -1,4 +1,4 @@
-title: Docker Demo for Digital Science Tech Forum
+title: Intro to Docker for the Digital Science Tech Forum
 output: index.html
 controls: true
 progress: true

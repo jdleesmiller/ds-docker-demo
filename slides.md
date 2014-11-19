@@ -6,7 +6,7 @@ progress: true
 --
 
 # Intro to Docker
-## &hellip; and how we use it at writeLaTeX
+## &hellip; and how we use it at [writeLaTeX](https://www.writelatex.com)
 ## &nbsp;
 ## Dr John Lees-Miller
 ## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@writelatex](https://twitter.com/@writelatex)

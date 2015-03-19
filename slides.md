@@ -6,10 +6,10 @@ progress: true
 --
 
 # Intro to Docker
-## &hellip; and how we use it at [writeLaTeX](https://www.writelatex.com)
+## &hellip; and how we use it at [Overleaf](https://www.overleaf.com)
 ## &nbsp;
 ## Dr John Lees-Miller
-## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@writelatex](https://twitter.com/@writelatex)
+## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@overleaf](https://twitter.com/@overleaf)
 ## Digital Science Tech Forum
 ## 30 Oct 2014
 
@@ -21,7 +21,7 @@ progress: true
 
 1. A look at what's happening behind the scenes.
 
-1. How we use docker at writeLaTeX, also by example.
+1. How we use docker at Overleaf, also by example.
 
 --
 
@@ -291,7 +291,7 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main
 
 --
 
-### Docker at writeLaTeX
+### Docker at Overleaf
 
 * We maintain a Dockerfile that builds an image with latex and lots of related tools.
 
@@ -306,6 +306,6 @@ docker run -it --rm --volume `pwd`:/tmp texlive pdflatex main
 # fin
 ## &nbsp;
 ## Dr John Lees-Miller
-## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@writelatex](https://twitter.com/@writelatex)
+## [@jdleesmiller](https://twitter.com/@jdleesmiller) [@overleaf](https://twitter.com/@overleaf)
 ## Digital Science Tech Forum
 ## 30 Oct 2014
